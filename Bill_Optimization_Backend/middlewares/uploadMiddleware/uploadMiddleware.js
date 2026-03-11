@@ -1,26 +1,15 @@
 const multer = require("multer");
-const path = require("path");
 
-// Storage engine
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, "uploads/"); // ensure this folder exists
-  },
-  filename: (req, file, cb) => {
-    const ext = path.extname(file.originalname);
-    const uniqueName = `${Date.now()}-${Math.round(Math.random() * 1e9)}${ext}`;
-    cb(null, uniqueName);
-  }
-});
+// ✅ memory storage — file stays in buffer for OCR processing
+const storage = multer.memoryStorage();
 
-// Allow Images + PDF
 const fileFilter = (req, file, cb) => {
   const allowedTypes = [
     "image/jpeg",
     "image/png",
     "image/jpg",
     "image/webp",
-    "application/pdf"
+    "application/pdf",
   ];
 
   if (allowedTypes.includes(file.mimetype)) {
@@ -30,6 +19,10 @@ const fileFilter = (req, file, cb) => {
   }
 };
 
-const upload = multer({ storage, fileFilter });
+const upload = multer({
+  storage,
+  fileFilter,
+  limits: { fileSize: 10 * 1024 * 1024 }, // 10MB max
+});
 
 module.exports = upload;

@@ -1,14 +1,10 @@
 const express = require("express");
 const router = express.Router();
 const upload = require("../../middlewares/uploadMiddleware/uploadMiddleware");
+const { scanAndCreateBill } = require("../../controllers/uploadController/uploadController");
+const { protect } = require("../../middlewares/authMiddleware/authMiddleware");
 
-// Upload bill file
-router.post("/upload-bill", upload.single("bill"), (req, res) => {
-  res.json({
-    success: true,
-    message: "File uploaded successfully",
-    file: req.file
-  });
-});
+// ✅ scan bill — OCR + AI + save to DB
+router.post("/scan-bill", protect, upload.single("file"), scanAndCreateBill);
 
 module.exports = router;
